@@ -6,6 +6,8 @@ import { GraphQLServer } from 'graphql-yoga';
 // Type definitions (schema)
 const typeDefs = `
     type Query {
+        greeting(name: String): String!
+        add(a: Float!, b: Float!): Float!
         me: User!
         post: Post!
     }
@@ -26,8 +28,23 @@ const typeDefs = `
 `;
 
 // Resolvers
+// ctx - context
+// args - args obj containing values provided
 const resolvers = {
     Query: {
+        greeting(parent, args, ctx, info) {
+            if (args.name) {
+                return `Hello ${args.name}!`;
+            }
+
+            return 'Hello!';
+        },
+        add(parent, args, ctx, info) {
+            if (args.a && args.b) {
+                return args.a + args.b;
+            }
+            return -1;
+        },
         me() {
             return {
                 id: '2113',
