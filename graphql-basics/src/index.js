@@ -1,4 +1,38 @@
-import addFunc, {subtract} from './math';
+import { GraphQLServer } from 'graphql-yoga';
 
-console.log('add: ', addFunc(1,3));
-console.log('subtract: ', subtract(5,3));
+// Type definitions (schema)
+const typeDefs = `
+    type Query {
+        hello: String!
+        name: String!
+        location: String!
+        bio: String!
+    }
+`;
+
+// Resolvers
+const resolvers = {
+    Query: {
+        hello() {
+            return 'This is my first query!'
+        },
+        name() {
+            return 'Magz B'
+        },
+        location() {
+            return 'Toronto, ON, Canada'
+        },
+        bio() {
+            return 'I am a web developer learning GraphQL'
+        }
+    }
+};
+
+const server = new GraphQLServer({
+    typeDefs,
+    resolvers
+});
+
+server.start(() => {
+    console.log('The server is up!');
+});
