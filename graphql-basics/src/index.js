@@ -21,7 +21,7 @@ const demoData = [
 // Type definitions (schema)
 const typeDefs = `
     type Query {
-        users: [User!]!
+        users(query: String):[User!]!
         me: User!
         post: Post!
     }
@@ -47,7 +47,12 @@ const typeDefs = `
 const resolvers = {
     Query: {
         users(parent, args, ctx, info) {
-            return demoData;
+            if (!args.query) {
+                return demoData;
+            }
+            return demoData.filter(user => {
+                return user.name.includes(args.query);
+            })
         },
         me() {
             return {
