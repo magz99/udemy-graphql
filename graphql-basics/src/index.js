@@ -17,7 +17,7 @@ const users = [{
     id: '3',
     name: 'Mike',
     email: 'mike@example.com'
-}]
+}];
 
 const posts = [{
     id: '10',
@@ -37,7 +37,26 @@ const posts = [{
     body: '',
     published: false,
     author: '2'
-}]
+}];
+
+const comments = [
+    {
+        id: '33',
+        text: 'This is a random comment, yay.'
+    },
+    {
+        id: '44',
+        text: 'Why does this comment exist?'
+    },
+    {
+        id: '55',
+        text: 'Hello, this is my comment!!!!'
+    },
+    {
+        id: '58',
+        text: 'I didn\'t like this book. I thought it was poorly written.'
+    }
+]
 
 
 // Type definitions (schema)
@@ -47,6 +66,7 @@ const typeDefs = `
         me: User!
         post: Post!
         posts(query: String): [Post!]!
+        comments: [Comment!]!
     }
 
     type User {
@@ -63,6 +83,11 @@ const typeDefs = `
         body: String!
         published: Boolean!
         author: User!
+    }
+
+    type Comment {
+        id: ID!
+        text: String!
     }
 `;
 
@@ -104,6 +129,9 @@ const resolvers = {
                 const bodyMatches = post.body.toLowerCase().includes(args.query.toLowerCase())
                 return titleMatches || bodyMatches;
             });
+        },
+        comments(parent, args, ctx, info) {
+            return comments;
         }
     },
     Post: {
