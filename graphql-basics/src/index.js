@@ -3,7 +3,7 @@ import { GraphQLServer } from 'graphql-yoga';
 // Scalar types - String, Boolean, Int, Float, ID
 // Scalar means 1 single value
 
-const demoData = [
+const demoUsers = [
     {
         id: 99,
         name: 'Magz',
@@ -18,12 +18,34 @@ const demoData = [
     }
 ];
 
+const demoPosts = [
+    {
+        id: 1,
+        title: 'My First Post',
+        body: 'This is the body of my first post....',
+        published: false
+    },
+    {
+        id: 2,
+        title: 'My Second Post',
+        body: 'This is the body of my second post....Hello.',
+        published: true
+    },
+    {
+        id: 3,
+        title: 'My Third Post',
+        body: 'This is the body of my third post....Not yet published',
+        published: false
+    }
+];
+
 // Type definitions (schema)
 const typeDefs = `
     type Query {
         users(query: String):[User!]!
         me: User!
         post: Post!
+        posts(query: String): [Post!]!
     }
 
     type User {
@@ -48,10 +70,10 @@ const resolvers = {
     Query: {
         users(parent, args, ctx, info) {
             if (!args.query) {
-                return demoData;
+                return demoUsers;
             }
-            return demoData.filter(user => {
-                return user.name.includes(args.query);
+            return demoUsers.filter(user => {
+                return user.name.toLowerCase().includes(args.query.toLowerCase());
             })
         },
         me() {
@@ -69,6 +91,14 @@ const resolvers = {
                 body: 'This is the body of the Post',
                 published: true
             }
+        },
+        posts(parent, args, ctx, info) {
+            if (!args.query) {
+                return demoPosts;
+            }
+            return demoPosts.filter(post => {
+                return post.title.toLowerCase().includes(args.query.toLowerCase()) || post.body.toLowerCase().includes(args.query.toLowerCase())
+            });
         }
     }
 };
