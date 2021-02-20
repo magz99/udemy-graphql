@@ -3,41 +3,42 @@ import { GraphQLServer } from 'graphql-yoga';
 // Scalar types - String, Boolean, Int, Float, ID
 // Scalar means 1 single value
 
-const demoUsers = [
-    {
-        id: 99,
-        name: 'Magz',
-        email: 'magzb.99@gmail.com',
-        age: 33
-    },
-    {
-        id: 88,
-        name: 'Sangin',
-        email: 'sangin@gmail.com',
-        age: 38
-    }
-];
+// Demo user data
+const users = [{
+    id: '1',
+    name: 'Andrew',
+    email: 'andrew@example.com',
+    age: 27
+}, {
+    id: '2',
+    name: 'Sarah',
+    email: 'sarah@example.com'
+}, {
+    id: '3',
+    name: 'Mike',
+    email: 'mike@example.com'
+}]
 
-const demoPosts = [
-    {
-        id: 1,
-        title: 'My First Post',
-        body: 'This is the body of my first post....',
-        published: false
-    },
-    {
-        id: 2,
-        title: 'My Second Post',
-        body: 'This is the body of my second post....Hello.',
-        published: true
-    },
-    {
-        id: 3,
-        title: 'My Third Post',
-        body: 'This is the body of my third post....Not yet published',
-        published: false
-    }
-];
+const posts = [{
+    id: '10',
+    title: 'GraphQL 101',
+    body: 'This is how to use GraphQL...',
+    published: true,
+    author: '1'
+}, {
+    id: '11',
+    title: 'GraphQL 201',
+    body: 'This is an advanced GraphQL post...',
+    published: false,
+    author: '1'
+}, {
+    id: '12',
+    title: 'Programming Music',
+    body: '',
+    published: false,
+    author: '2'
+}]
+
 
 // Type definitions (schema)
 const typeDefs = `
@@ -60,6 +61,7 @@ const typeDefs = `
         title: String!
         body: String!
         published: Boolean!
+        author: User!
     }
 `;
 
@@ -70,9 +72,9 @@ const resolvers = {
     Query: {
         users(parent, args, ctx, info) {
             if (!args.query) {
-                return demoUsers;
+                return users;
             }
-            return demoUsers.filter(user => {
+            return users.filter(user => {
                 return user.name.toLowerCase().includes(args.query.toLowerCase());
             })
         },
@@ -94,11 +96,20 @@ const resolvers = {
         },
         posts(parent, args, ctx, info) {
             if (!args.query) {
-                return demoPosts;
+                return posts;
             }
-            return demoPosts.filter(post => {
-                return post.title.toLowerCase().includes(args.query.toLowerCase()) || post.body.toLowerCase().includes(args.query.toLowerCase())
+            return posts.filter(post => {
+                const titleMatches = post.title.toLowerCase().includes(args.query.toLowerCase());
+                const bodyMatches = post.body.toLowerCase().includes(args.query.toLowerCase())
+                return titleMatches || bodyMatches;
             });
+        }
+    },
+    Post: {
+        author(parent, args, ctx, info) {
+            return users.find((user) => {
+                return user.id === parent.author;
+            })
         }
     }
 };
