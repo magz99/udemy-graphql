@@ -3,12 +3,25 @@ import { GraphQLServer } from 'graphql-yoga';
 // Scalar types - String, Boolean, Int, Float, ID
 // Scalar means 1 single value
 
+const demoData = [
+    {
+        id: 99,
+        name: 'Magz',
+        email: 'magzb.99@gmail.com',
+        age: 33
+    },
+    {
+        id: 88,
+        name: 'Sangin',
+        email: 'sangin@gmail.com',
+        age: 38
+    }
+];
+
 // Type definitions (schema)
 const typeDefs = `
     type Query {
-        greeting(name: String): String!
-        add(numbers: [Float!]!): Float!
-        grades: [Int!]!
+        users: [User!]!
         me: User!
         post: Post!
     }
@@ -33,20 +46,8 @@ const typeDefs = `
 // args - args obj containing values provided
 const resolvers = {
     Query: {
-        greeting(parent, args, ctx, info) {
-            if (args.name) {
-                return `Hello ${args.name}!`;
-            }
-
-            return 'Hello!';
-        },
-        add(parent, args, ctx, info) {
-            if (args.numbers.length) {
-                return args.numbers.reduce((agg, curr) => {
-                    return agg += curr;
-                }, 0);
-            }
-            return 0;
+        users(parent, args, ctx, info) {
+            return demoData;
         },
         me() {
             return {
@@ -63,9 +64,6 @@ const resolvers = {
                 body: 'This is the body of the Post',
                 published: true
             }
-        },
-        grades() {
-            return [70, 90, 80]
         }
     }
 };
