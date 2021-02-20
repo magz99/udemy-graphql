@@ -3,14 +3,49 @@ import { GraphQLServer } from 'graphql-yoga';
 // Scalar types - String, Boolean, Int, Float, ID
 // Scalar means 1 single value
 
+const demoUsers = [
+    {
+        id: 99,
+        name: 'Magz',
+        email: 'magzb.99@gmail.com',
+        age: 33
+    },
+    {
+        id: 88,
+        name: 'Sangin',
+        email: 'sangin@gmail.com',
+        age: 38
+    }
+];
+
+const demoPosts = [
+    {
+        id: 1,
+        title: 'My First Post',
+        body: 'This is the body of my first post....',
+        published: false
+    },
+    {
+        id: 2,
+        title: 'My Second Post',
+        body: 'This is the body of my second post....Hello.',
+        published: true
+    },
+    {
+        id: 3,
+        title: 'My Third Post',
+        body: 'This is the body of my third post....Not yet published',
+        published: false
+    }
+];
+
 // Type definitions (schema)
 const typeDefs = `
     type Query {
-        greeting(name: String): String!
-        add(numbers: [Float!]!): Float!
-        grades: [Int!]!
+        users(query: String):[User!]!
         me: User!
         post: Post!
+        posts(query: String): [Post!]!
     }
 
     type User {
@@ -33,20 +68,13 @@ const typeDefs = `
 // args - args obj containing values provided
 const resolvers = {
     Query: {
-        greeting(parent, args, ctx, info) {
-            if (args.name) {
-                return `Hello ${args.name}!`;
+        users(parent, args, ctx, info) {
+            if (!args.query) {
+                return demoUsers;
             }
-
-            return 'Hello!';
-        },
-        add(parent, args, ctx, info) {
-            if (args.numbers.length) {
-                return args.numbers.reduce((agg, curr) => {
-                    return agg += curr;
-                }, 0);
-            }
-            return 0;
+            return demoUsers.filter(user => {
+                return user.name.toLowerCase().includes(args.query.toLowerCase());
+            })
         },
         me() {
             return {
@@ -64,8 +92,13 @@ const resolvers = {
                 published: true
             }
         },
-        grades() {
-            return [70, 90, 80]
+        posts(parent, args, ctx, info) {
+            if (!args.query) {
+                return demoPosts;
+            }
+            return demoPosts.filter(post => {
+                return post.title.toLowerCase().includes(args.query.toLowerCase()) || post.body.toLowerCase().includes(args.query.toLowerCase())
+            });
         }
     }
 };
