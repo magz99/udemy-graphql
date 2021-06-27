@@ -8,6 +8,13 @@ const prisma = new Prisma({
 // prisma.query prisma.mutation prisma.subscription prisma.exists
 
 const createPostForUser = async (authorId, data) => {
+
+    const userExists = await prisma.exists.User({ id: authorId });
+
+    if (!userExists) {
+        throw new Error('User does not exist.');
+    }
+
     const post = await prisma.mutation.createPost({
         data: {
             ...data,
@@ -17,18 +24,20 @@ const createPostForUser = async (authorId, data) => {
                 }
             }
         }
-    }, '{ id }');
+    }, '{ author { id name email posts { id title published } } }');
 
-    const user = await prisma.query.user({
-        where: {
-            id: authorId
-        }
-    }, '{ id name email posts { id title published } }');
-
-    return user;
+    return post.author;
 };
 
 const updatePostForUser = async (postId, data) => {
+
+    const postExists = await prisma.exists.Post({
+        id: postId
+    });
+
+    if (!postExists) {
+        throw new Error('Post does not exist.');
+    }
 
     const post = await prisma.mutation.updatePost({
         where: {
@@ -37,29 +46,28 @@ const updatePostForUser = async (postId, data) => {
         data: {
             ...data
         }
-    }, '{ author { id } }');
+    }, '{ author { id name email posts { id title published } } }');
 
-    const user = await prisma.query.user({
-        where: {
-            id: post.author.id
-        }
-    }, '{ id name email posts { id title published } }');
+    return post.author;
 
-    return user;
 };
 
-// updatePostForUser('ckqflgzv000m70916hgo5y3vp', {
-//     title: 'Not so great post....boooo'
-// }).then((user) => {
-//     console.log(JSON.stringify(user, undefined, 2));
-// });
+updatePostForUser('ckqflgzv000m70916hgo5y3vp', {
+    title: 'Not so great post....boooo'
+}).then((user) => {
+    console.log(JSON.stringify(user, undefined, 2));
+}).catch((error) => {
+    console.log(error.message);
+});
 
-// createPostForUser('ckqfg16il002d09163h5v1zvh', {
+// createPostForUser('ckqfgtu7o004e0916szpxvf4m', {
 //     title: 'Great post...hahaha',
 //     body: 'I recommend not to read any books....',
 //     published: true
 // }).then((user) => {
 //     console.log(JSON.stringify(user, undefined, 2));
+// }).catch((error) => {
+//     console.log(error.message);
 // })
 
 // prisma.query.users(null, '{ id name posts { id title } }').then((data) => {
